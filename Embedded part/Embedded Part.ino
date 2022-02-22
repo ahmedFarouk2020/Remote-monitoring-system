@@ -14,20 +14,18 @@ void setup()
 
 void loop() 
 {
-
   /* Get readings of DHT */
   DHT11.read(dht_pin);
   /* Get the reading of ir sensor */
   IRSensorReading = digitalRead(IRSENSOR);
   /* print the output on serial monitor */
   /* this part can be commented while working with esp8266 */
-  Serial.print("Current humidity = ");
-  Serial.print(DHT11.humidity);
-  Serial.print("%  ");
-  Serial.print("temperature = ");
+  Serial.print("farouk.asdsad.com/get-server-order?");
+  Serial.print("s1= ");
+  Serial.print(IRSensorReading);
+  Serial.print("&s2= ");
   Serial.print(DHT11.temperature); 
-  Serial.println("C  ");
-  Serial.print("IR = ");
-  Serial.println(IRSensorReading);
-  delay(1000);
+  Serial.print("&s3= ");
+  Serial.print(DHT11.humidity);
+  delay(5000);
 }
