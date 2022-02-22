@@ -1,12 +1,23 @@
 from flask import Flask, render_template, request
-
+from flask_pwa import PWA
 from mysql_db import DB
+
+def create_app():
+    app = Flask(__name__)
+    PWA(app)
+
+    @app.route('/')
+    def home():
+        return render_template("index.html")
+
+    return app
+
+
 
 
 db = DB("localhost", "farook", "database-sensor-esp-flask", "sensors")
 
 
-app = Flask(__name__)
 
 
 IDEL   = 0
@@ -32,10 +43,11 @@ def report_decision(reading1, reading2):
 
 
 
+app = create_app()
 
-@app.route('/')
-def route():
-    return render_template("index.html")
+# @app.route('/')
+# def home():
+#     return render_template("index.html")
 
 
 @app.route('/get-server-order')
@@ -49,7 +61,6 @@ def read_sensors_data():
 def store_sensors_data():
     """ store sensors readings in DB """
 
-
     s1 = request.args.get('s1')
     s2 = request.args.get('s2')
 
@@ -62,3 +73,4 @@ def store_sensors_data():
 
 if __name__ == '__main__' :
     app.run(debug=True) # debug=True, host= '0.0.0.0', port=8090
+
