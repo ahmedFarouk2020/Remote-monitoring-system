@@ -1,12 +1,9 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 
 from mysql_db import DB
 
 
-db = DB('Farouk21.mysql.pythonanywhere-services.com',
-        'Farouk21',
-        'database-sensor-esp-flask',
-        'Farouk21$sensors')
+db = DB("localhost", "farook", "database-sensor-esp-flask", "sensors")
 
 
 app = Flask(__name__)
@@ -27,10 +24,10 @@ def report_decision(reading1, reading2):
     """
 
     global server_order
-    if reading1 > threshold1:
+    if int(reading1) > int(threshold1):
         server_order = ORDER1
 
-    if reading2 > threshold2:
+    if int(reading2) > int(threshold2):
         server_order = ORDER2
 
 
@@ -45,17 +42,23 @@ def route():
 def read_sensors_data():
     """ return a value represent an order to esp depending on sensors data """
    
-    return server_order
+    return str(server_order)
 
 
-@app.route('/get-sensor-data?s1=<string:s1>,s2=<string:s2>')
-def store_sensors_data(s1: str, s2: str):
+@app.route('/get-sensor-data')
+def store_sensors_data():
     """ store sensors readings in DB """
+
+
+    s1 = request.args.get('s1')
+    s2 = request.args.get('s2')
 
     sql = f"INSERT INTO readings (sensor1, sensor2) VALUES ({s1}, {s2})"
     db.execute_sql_command(sql)
 
     report_decision(s1,s2)
 
+    return 'OK'
+
 if __name__ == '__main__' :
-    app.run() # debug=True, host= '0.0.0.0', port=8090
+    app.run(debug=True) # debug=True, host= '0.0.0.0', port=8090
