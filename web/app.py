@@ -2,6 +2,19 @@ from flask import Flask, render_template, request
 from flask_pwa import PWA
 from mysql_db import DB
 
+
+#---------   Global Variables  -----
+record_id = 0
+
+IDEL   = 0
+ORDER1 = 1
+ORDER2 = 2
+server_order = IDEL
+
+threshold1 = 50
+threshold2 = 30
+#-----------------------------------
+
 def create_app():
     app = Flask(__name__)
     PWA(app)
@@ -16,17 +29,26 @@ def create_app():
 
 
 db = DB("localhost", "farook", "database-sensor-esp-flask", "sensors")
+# db = DB("farook2022.mysql.pythonanywhere-services.com",
+#             "farook2022",
+#             "asd123#@!",
+#             "farook2022$sensors")
 
 
+def save_to_file():
+    """ save a record to a file """
 
 
-IDEL   = 0
-ORDER1 = 1
-ORDER2 = 2
-server_order = IDEL
+    sql = f"SELECT * FROM readings ORDER BY id DESC LIMIT 1"
+    db.execute_sql_command(sql)
 
-threshold1 = 50
-threshold2 = 30
+    
+    sensor1_reading, sensor2_reading, record_id = db.mycursor.fetchone()
+    print(sensor1_reading, sensor2_reading)
+    with open('local-db/local.csv','a') as file:
+        file.write(str(record_id)+','+str(sensor1_reading)+','+str(sensor2_reading)+'\n')
+        file.close()
+
 
 def report_decision(reading1, reading2):
     """ set <server_order> variable depending on sensor readings 
@@ -59,17 +81,31 @@ def read_sensors_data():
 
 @app.route('/get-sensor-data')
 def store_sensors_data():
-    """ store sensors readings in DB """
+    """ store sensors readings in DB 
+        Mobile app should only get the last line each time requesting this url
+    """
 
-    s1 = request.args.get('s1')
-    s2 = request.args.get('s2')
+    s1 = str(request.args.get('s1'))
+    s2 = str(request.args.get('s2'))
+
+    print(s1, s2)
 
     sql = f"INSERT INTO readings (sensor1, sensor2) VALUES ({s1}, {s2})"
     db.execute_sql_command(sql)
 
     report_decision(s1,s2)
+    save_to_file()
 
     return 'OK'
+
+
+
+
+
+    
+
+    
+    
 
 if __name__ == '__main__' :
     app.run(debug=True) # debug=True, host= '0.0.0.0', port=8090
