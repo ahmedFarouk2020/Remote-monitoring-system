@@ -33,7 +33,7 @@ db = DB("localhost", "farook", "database-sensor-esp-flask", "sensors")
 #             "farook2022",
 #             "asd123#@!",
 #             "farook2022$sensors")
-
+db.execute_sql_command('TRUNCATE TABLE readings')
 
 def save_to_file():
     """ save a record to a file """
@@ -46,7 +46,7 @@ def save_to_file():
     sensor1_reading, sensor2_reading, record_id = db.mycursor.fetchone()
     print(sensor1_reading, sensor2_reading)
     with open('local-db/local.csv','a') as file:
-        file.write(str(record_id)+','+str(sensor1_reading)+','+str(sensor2_reading)+'\n')
+        file.write(str(record_id)+','+str(sensor1_reading)+','+str(sensor2_reading)+'\r\n')
         file.close()
 
 
@@ -101,7 +101,15 @@ def store_sensors_data():
 
 
 
+@app.route('/retrieve-local-db')
+def get_file_data():
+    local_db = None
+    with open('local.csv','r+') as file:
+        local_db = file.read()
+        file.truncate(0)
+        file.close()
 
+    return local_db
     
 
     
