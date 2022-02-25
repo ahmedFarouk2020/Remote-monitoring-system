@@ -16,7 +16,6 @@ host="Farouk21.mysql.pythonanywhere-services.com",
 class DB():
     def __init__(self, hostname, username, password, database_name) -> None:
 
-        no_database = False
 
         try :
             self.db = MySQL.connect(
@@ -41,7 +40,7 @@ class DB():
         try:
             self.mycursor.execute(f"CREATE DATABASE {database_name}")
             self.mycursor.execute("CREATE TABLE readings (sensor1 VARCHAR(255), \
-            sensor2 VARCHAR(255), id int(11) AUTO_INCREMENT )")
+            sensor2 VARCHAR(255), id int(11) AUTO_INCREMENT PRIMARY KEY)")
 
         except:
             pass
@@ -55,16 +54,3 @@ class DB():
             self.db.commit()
         except:
             print("Changes already commited")
-
-
-
-# db = DB("farook2022.mysql.pythonanywhere-services.com",
-#             "farook2022",
-#             "asd123#@!",
-#             "farook2022$sensors")
-
-# db = DB("localhost", "farook", "database-sensor-esp-flask", "sensors")
-
-# readings = "readings"
-# all = db.execute_sql_command(f"SELECT * FROM {readings}")
-# print(all)
